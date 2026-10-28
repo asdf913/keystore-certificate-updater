@@ -46,6 +46,33 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.22.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.github.toolfactory/narcissus -->
+		<dependency>
+			<groupId>io.github.toolfactory</groupId>
+			<artifactId>narcissus</artifactId>
+			<version>1.0.13</version>
+		</dependency>
+		<!--https://mvnrepository.com/artifact/org.testng/testngs -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>7.5.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.7.2-jre</version>
+			<scope>test</scope>
+		</dependency>
+		<!--https://mvnrepository.com/artifact/org.javassist/javassist-->
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.33.0-GA</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

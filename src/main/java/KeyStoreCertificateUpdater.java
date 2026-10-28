@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,6 +50,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.validator.routines.DomainValidator;
 import org.d2ab.function.ObjIntPredicate;
 
+import io.github.toolfactory.narcissus.Narcissus;
+
 public class KeyStoreCertificateUpdater {
 
 	public static void main(final String[] args) throws Exception {
@@ -63,17 +66,14 @@ public class KeyStoreCertificateUpdater {
 		//
 		final Certificate certificate = getCertfiicate(url);
 		//
-		System.out
-				.println(
-						String.format("Certificate(%1$s)=%2$s", md != null ? md.getAlgorithm() : null,
-								testAndApply(Objects::nonNull,
-										testAndApply(Objects::nonNull, getEncoded(certificate),
-												x -> md != null ? md.digest(x) : null, null),
-										Hex::encodeHexString, null)));
+		System.out.println(String.format("Certificate(%1$s)=%2$s", getAlgorithm(md),
+				testAndApply(Objects::nonNull,
+						testAndApply(Objects::nonNull, getEncoded(certificate), x -> digest(md, x), null),
+						Hex::encodeHexString, null)));
 		//
 		final File keyStoreFile = testAndApply(Objects::nonNull, get(map, "keyStore"), File::new, null);
 		//
-		System.out.println("keyStore            =" + (keyStoreFile != null ? keyStoreFile.getAbsolutePath() : null));
+		System.out.println("keyStore            =" + getAbsolutePath(keyStoreFile));
 		//
 		final String password = get(map, "password");
 		//
@@ -106,7 +106,7 @@ public class KeyStoreCertificateUpdater {
 				if (isCertificateEntry(keyStore, alias = nextElement(aliases))
 						&& (c = getCertificate(keyStore, alias)) != null) {
 					//
-					if (Arrays.equals(certificate.getEncoded(), c.getEncoded()) && (found = true)) {
+					if (Arrays.equals(getEncoded(certificate), getEncoded(c)) && (found = true)) {
 						//
 						break;
 						//
@@ -124,8 +124,7 @@ public class KeyStoreCertificateUpdater {
 				//
 				System.out.println("alias               =" + (alias = StringUtils.joinWith("_",
 						StringUtils.substringAfter(getName(getSubjectX500Principal(x509Certificate)), '='),
-						df.format(x509Certificate != null ? x509Certificate.getNotBefore() : null),
-						df.format(x509Certificate != null ? x509Certificate.getNotAfter() : null))));
+						df.format(getNotBefore(x509Certificate)), df.format(getNotAfter(x509Certificate)))));
 				//
 				keyStore.setCertificateEntry(alias, certificate);
 				//
@@ -147,6 +146,22 @@ public class KeyStoreCertificateUpdater {
 			//
 	}
 
+	private static Date getNotBefore(final X509Certificate instnace) {
+		return instnace != null ? instnace.getNotBefore() : null;
+	}
+
+	private static Date getNotAfter(final X509Certificate instnace) {
+		return instnace != null ? instnace.getNotAfter() : null;
+	}
+
+	private static String getAbsolutePath(final File instance) {
+		return instance != null && instance.getPath() != null ? instance.getAbsolutePath() : null;
+	}
+
+	private static String getAlgorithm(final MessageDigest instance) {
+		return instance != null ? instance.getAlgorithm() : null;
+	}
+
 	private static byte[] getEncoded(final Certificate instance) throws CertificateEncodingException {
 		return instance != null ? instance.getEncoded() : null;
 	}
@@ -154,8 +169,23 @@ public class KeyStoreCertificateUpdater {
 	private static Certificate getCertfiicate(final String url)
 			throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
 		//
-		final HttpsURLConnection httpsURLConnection = cast(HttpsURLConnection.class,
-				openConnection(testAndApply(x -> x != null, url, URL::new, null)));
+		final HttpsURLConnection httpsURLConnection = cast(HttpsURLConnection.class, openConnection(testAndApply(x -> {
+			//
+			if (x == null) {
+				//
+				return false;
+				//
+			} // if
+				//
+			final Field field = testAndApply(y -> size(y) == 1,
+					collect(filter(
+							stream(testAndApply(Objects::nonNull, getClass(x), FieldUtils::getAllFieldsList, null)),
+							f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+					y -> get(y, 0), null);
+			//
+			return field == null || Narcissus.getField(x, field) != null;
+			//
+		}, url, URL::new, null)));
 		//
 		connect(httpsURLConnection);
 		//
@@ -186,6 +216,24 @@ public class KeyStoreCertificateUpdater {
 		//
 	}
 
+	private static byte[] digest(final MessageDigest instance, final byte[] input) {
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "digestBuffer")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		return field == null || Narcissus.getField(instance, field) != null ? instance.digest(input) : null;
+		//
+	}
+
 	private static <E> void add(final Collection<E> instance, final E item) {
 		if (instance != null) {
 			instance.add(item);
@@ -193,11 +241,41 @@ public class KeyStoreCertificateUpdater {
 	}
 
 	private static Certificate getCertificate(final KeyStore instance, final String alias) throws KeyStoreException {
-		return instance != null ? instance.getCertificate(alias) : null;
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		return field == null || (field != null && Objects.equals(field.getType(), Boolean.TYPE)
+				&& Narcissus.getBooleanField(instance, field)) ? instance.getCertificate(alias) : null;
+		//
 	}
 
 	private static boolean isCertificateEntry(final KeyStore instance, final String alias) throws KeyStoreException {
-		return instance != null && instance.isCertificateEntry(alias);
+		//
+		if (instance == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		return (field == null || (field != null && Objects.equals(field.getType(), Boolean.TYPE)
+				&& Narcissus.getBooleanField(instance, field))) && instance.isCertificateEntry(alias);
+		//
 	}
 
 	private static <E> E nextElement(final Enumeration<E> instance) {
@@ -209,7 +287,22 @@ public class KeyStoreCertificateUpdater {
 	}
 
 	private static Enumeration<String> aliases(final KeyStore instance) throws KeyStoreException {
-		return instance != null ? instance.aliases() : null;
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		return field == null || (field != null && Objects.equals(field.getType(), Boolean.TYPE)
+				&& Narcissus.getBooleanField(instance, field)) ? instance.aliases() : null;
+		//
 	}
 
 	private static void load(final KeyStore instance, final InputStream stream, final char[] password)
@@ -240,22 +333,79 @@ public class KeyStoreCertificateUpdater {
 	}
 
 	private static boolean isValid(final DomainValidator instance, final String domain) {
-		return instance != null && domain != null && instance.isValid(domain);
+		//
+		if (instance == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "domainRegex")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		if (field != null && Narcissus.getField(instance, field) == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		if ((field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(domain), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+				x -> get(x, 0), null)) != null && Narcissus.getField(domain, field) == null) {
+			//
+			return false;
+			//
+		} // if
+			//
+		return domain != null && instance.isValid(domain);
+		//
 	}
 
 	private static void disconnect(final HttpsURLConnection instance) {
-		if (instance != null) {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "delegate")), Collectors.toList()),
+				x -> get(x, 0), null);
+
+		//
+		if (field == null || Narcissus.getField(instance, field) != null) {
+			//
 			instance.disconnect();
-		}
+			//
+		} // if
+			//
 	}
 
 	private static String longestCommonSubstring(final String a, final String b) {
 		//
 		int start = 0, max = 0;
 		//
-		for (int i = 0; and(a != null, (value, index) -> index < StringUtils.length(value), a, i); i++) {
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(stream(testAndApply(Objects::nonNull, getClass(a), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		final boolean conditionA = or(field, Objects::isNull, f -> Narcissus.getField(a, f) != null);
+		//
+		final boolean conditionB = or(field, Objects::isNull,
+				f -> and(b, Objects::nonNull, g -> Narcissus.getField(g, f) != null));
+		//
+		for (int i = 0; and(conditionA, (value, index) -> index < StringUtils.length(value), a, i); i++) {
 			//
-			for (int j = 0; and(b != null, (value, index) -> index < StringUtils.length(value), b, j); j++) {
+			for (int j = 0; and(conditionB, (value, index) -> index < StringUtils.length(value), b, j); j++) {
 				//
 				int x = 0;
 				//
@@ -283,8 +433,16 @@ public class KeyStoreCertificateUpdater {
 				//
 		} // for
 			//
-		return StringUtils.substring(a, start, start + max);
+		return conditionA ? StringUtils.substring(a, start, start + max) : null;
 		//
+	}
+
+	private static <T> boolean and(final T value, final Predicate<T> a, final Predicate<T> b) {
+		return test(a, value) && test(b, value);
+	}
+
+	private static <T> boolean or(final T value, final Predicate<T> a, final Predicate<T> b) {
+		return test(a, value) || test(b, value);
 	}
 
 	private static <T> boolean and(final boolean condition, final ObjIntPredicate<T> objIntPredicate, final T value,
@@ -293,7 +451,21 @@ public class KeyStoreCertificateUpdater {
 	}
 
 	private static String getName(final X500Principal instance) {
-		return instance != null ? instance.getName() : null;
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "thisX500Name")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		return field == null || Narcissus.getField(instance, field) != null ? instance.getName() : null;
+		//
 	}
 
 	private static X500Principal getSubjectX500Principal(final X509Certificate instance) {
@@ -302,13 +474,45 @@ public class KeyStoreCertificateUpdater {
 
 	private static Certificate[] getServerCertificates(final HttpsURLConnection instance)
 			throws SSLPeerUnverifiedException {
-		return instance != null ? instance.getServerCertificates() : null;
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "delegate")), Collectors.toList()),
+				x -> get(x, 0), null);
+
+		//
+		return field == null || Narcissus.getField(instance, field) != null ? instance.getServerCertificates() : null;
+		//
 	}
 
 	private static void connect(final HttpsURLConnection instance) throws IOException {
-		if (instance != null) {
+		//
+		if (instance == null) {
+			//
+			return;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "delegate")), Collectors.toList()),
+				x -> get(x, 0), null);
+
+		//
+		if (field == null || Narcissus.getField(instance, field) != null) {
+			//
 			instance.connect();
-		}
+			//
+		} // if
+			//
 	}
 
 	private static <T> T cast(final Class<T> clz, final Object instance) {
@@ -316,7 +520,21 @@ public class KeyStoreCertificateUpdater {
 	}
 
 	private static URLConnection openConnection(final URL instance) throws IOException {
-		return instance != null ? instance.openConnection() : null;
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "handler")), Collectors.toList()),
+				x -> get(x, 0), null);
+		//
+		return field == null || Narcissus.getField(instance, field) != null ? instance.openConnection() : null;
+		//
 	}
 
 	private static <V> V get(final Map<?, V> instance, final Object key) {
@@ -373,6 +591,12 @@ public class KeyStoreCertificateUpdater {
 					filter(stream(testAndApply(Objects::nonNull, getClass(string), FieldUtils::getAllFieldsList, null)),
 							f -> Objects.equals(getName(f), "value")),
 					Collectors.toList()), x -> get(x, 0), null);
+			//
+		} // if
+			//
+		if (string != null && field != null && Narcissus.getField(string, field) == null) {
+			//
+			return null;
 			//
 		} // if
 			//
