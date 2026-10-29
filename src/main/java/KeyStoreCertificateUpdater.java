@@ -269,8 +269,10 @@ public class KeyStoreCertificateUpdater {
 						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
-		return field == null || (field != null && Objects.equals(field.getType(), Boolean.TYPE)
-				&& Narcissus.getBooleanField(instance, field)) ? instance.getCertificate(alias) : null;
+		return field == null
+				|| (Objects.equals(field.getType(), Boolean.TYPE) && Narcissus.getBooleanField(instance, field))
+						? instance.getCertificate(alias)
+						: null;
 		//
 	}
 
@@ -288,8 +290,9 @@ public class KeyStoreCertificateUpdater {
 						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
-		return (field == null || (field != null && Objects.equals(field.getType(), Boolean.TYPE)
-				&& Narcissus.getBooleanField(instance, field))) && instance.isCertificateEntry(alias);
+		return (field == null
+				|| (Objects.equals(field.getType(), Boolean.TYPE) && Narcissus.getBooleanField(instance, field)))
+				&& instance.isCertificateEntry(alias);
 		//
 	}
 
@@ -315,8 +318,10 @@ public class KeyStoreCertificateUpdater {
 						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
-		return field == null || (field != null && Objects.equals(field.getType(), Boolean.TYPE)
-				&& Narcissus.getBooleanField(instance, field)) ? instance.aliases() : null;
+		return field == null
+				|| (Objects.equals(field.getType(), Boolean.TYPE) && Narcissus.getBooleanField(instance, field))
+						? instance.aliases()
+						: null;
 		//
 	}
 
@@ -598,17 +603,12 @@ public class KeyStoreCertificateUpdater {
 
 	private static Entry<String, String> toEntry(final String string) {
 		//
-		Field field = null;
+		final Field field = testAndApply(x -> size(x) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(string), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+				x -> get(x, 0), null);
 		//
-		if (field == null) {
-			//
-			field = testAndApply(x -> size(x) == 1, collect(
-					filter(stream(testAndApply(Objects::nonNull, getClass(string), FieldUtils::getAllFieldsList, null)),
-							f -> Objects.equals(getName(f), "value")),
-					Collectors.toList()), x -> get(x, 0), null);
-			//
-		} // if
-			//
 		if (string != null && field != null && Narcissus.getField(string, field) == null) {
 			//
 			return null;
