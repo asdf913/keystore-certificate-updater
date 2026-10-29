@@ -76,7 +76,7 @@ public class KeyStoreCertificateUpdater {
 		//
 		System.out.println("keyStore            =" + getAbsolutePath(keyStoreFile));
 		//
-		final String password = get(map, "password");
+		final char[] password = toCharArray(get(map, "password"));
 		//
 		boolean found = false;
 		//
@@ -90,7 +90,7 @@ public class KeyStoreCertificateUpdater {
 			//
 			if (is != null) {
 				//
-				load(keyStore, is, password != null ? password.toCharArray() : null);
+				load(keyStore, is, password);
 				//
 				load = true;
 				//
@@ -131,7 +131,7 @@ public class KeyStoreCertificateUpdater {
 				//
 				try (final OutputStream os = new FileOutputStream(keyStoreFile)) {
 					//
-					keyStore.store(os, password != null ? password.toCharArray() : null);
+					keyStore.store(os, password);
 					//
 				} // try
 					//
@@ -145,6 +145,24 @@ public class KeyStoreCertificateUpdater {
 				//
 		} // try
 			//
+	}
+
+	private static char[] toCharArray(final String instance) {
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(y -> size(y) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+				y -> get(y, 0), null);
+		//
+		return field == null || Narcissus.getField(instance, field) != null ? instance.toCharArray() : null;
+		//
 	}
 
 	private static Date getNotBefore(final X509Certificate instnace) {
