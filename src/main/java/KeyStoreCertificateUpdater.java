@@ -66,10 +66,11 @@ public class KeyStoreCertificateUpdater {
 		//
 		final Certificate certificate = getCertfiicate(url);
 		//
-		System.out.println(String.format("Certificate(%1$s)=%2$s", getAlgorithm(md),
+		System.out.printf("Certificate(%1$s)=%2$s%3$s", getAlgorithm(md),
 				testAndApply(Objects::nonNull,
 						testAndApply(Objects::nonNull, getEncoded(certificate), x -> digest(md, x), null),
-						Hex::encodeHexString, null)));
+						Hex::encodeHexString, null),
+				System.lineSeparator());
 		//
 		final File keyStoreFile = testAndApply(Objects::nonNull, get(map, "keyStore"), File::new, null);
 		//
