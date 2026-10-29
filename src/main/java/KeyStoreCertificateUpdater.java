@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.KeyStore;
@@ -182,8 +183,7 @@ public class KeyStoreCertificateUpdater {
 		return instance != null ? instance.getEncoded() : null;
 	}
 
-	private static Certificate getCertfiicate(final String url)
-			throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+	private static Certificate getCertfiicate(final String url) throws IOException {
 		//
 		final HttpsURLConnection httpsURLConnection = cast(HttpsURLConnection.class, openConnection(testAndApply(x -> {
 			//
