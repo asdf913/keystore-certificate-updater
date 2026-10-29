@@ -410,8 +410,6 @@ class KeyStoreCertificateUpdaterTest {
 					//
 			} // for
 				//
-			System.out.println(m);
-			//
 			os = toArray(collection);
 			//
 			toString = Objects.toString(m);
