@@ -413,7 +413,7 @@ class KeyStoreCertificateUpdaterTest {
 			result = Narcissus.invokeStaticMethod(m, os);
 			//
 			if (contains(Arrays.asList(Integer.TYPE, Boolean.TYPE), getReturnType(m))
-					|| Boolean.logicalAnd(Objects.equals(name = getName(m), "getClass"),
+					|| Boolean.logicalAnd(Objects.equals(name, "getClass"),
 							Arrays.equals(parameterTypes, new Object[] { Object.class }))
 					|| Boolean.logicalAnd(Objects.equals(name, "getName"),
 							Arrays.equals(parameterTypes, new Object[] { X500Principal.class }))
