@@ -128,9 +128,10 @@ public class KeyStoreCertificateUpdater {
 				//
 				final DateFormat df = new SimpleDateFormat("yyyyMMdd");
 				//
-				System.out.println("alias               =" + (alias = StringUtils.joinWith("_",
-						StringUtils.substringAfter(getName(getSubjectX500Principal(x509Certificate)), '='),
-						df.format(getNotBefore(x509Certificate)), df.format(getNotAfter(x509Certificate)))));
+				info(LOG, "alias               ={}",
+						alias = StringUtils.joinWith("_",
+								StringUtils.substringAfter(getName(getSubjectX500Principal(x509Certificate)), '='),
+								df.format(getNotBefore(x509Certificate)), df.format(getNotAfter(x509Certificate))));
 				//
 				keyStore.setCertificateEntry(alias, certificate);
 				//
