@@ -105,14 +105,11 @@ public class KeyStoreCertificateUpdater {
 			while (hasMoreElements(aliases)) {
 				//
 				if (isCertificateEntry(keyStore, alias = nextElement(aliases))
-						&& (c = getCertificate(keyStore, alias)) != null) {
+						&& (c = getCertificate(keyStore, alias)) != null
+						&& Arrays.equals(getEncoded(certificate), getEncoded(c)) && (found = true)) {
 					//
-					if (Arrays.equals(getEncoded(certificate), getEncoded(c)) && (found = true)) {
-						//
-						break;
-						//
-					} // if
-						//
+					break;
+					//
 				} // if
 					//
 			} // while

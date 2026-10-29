@@ -171,14 +171,10 @@ class KeyStoreCertificateUpdaterTest {
 			//
 			final String name = getName(thisMethod);
 			//
-			if (self instanceof Certificate) {
+			if (self instanceof Certificate && Objects.equals(name, "getEncoded")) {
 				//
-				if (Objects.equals(name, "getEncoded")) {
-					//
-					return null;
-					//
-				} // if
-					//
+				return null;
+				//
 			} // if
 				//
 			throw new Throwable(name);
