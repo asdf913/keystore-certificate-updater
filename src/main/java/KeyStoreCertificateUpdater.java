@@ -54,6 +54,12 @@ import io.github.toolfactory.narcissus.Narcissus;
 
 public class KeyStoreCertificateUpdater {
 
+	private static final String DELEGATE = "delegate";
+
+	private static final String INITIALIZED = "initialized";
+
+	private static final String VALUE = "value";
+
 	public static void main(final String[] args) throws Exception {
 		//
 		final Map<String, String> map = toMap(args);
@@ -155,7 +161,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(y -> size(y) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				y -> get(y, 0), null);
 		//
 		return field == null || Narcissus.getField(instance, field) != null ? instance.toCharArray() : null;
@@ -195,7 +201,7 @@ public class KeyStoreCertificateUpdater {
 			final Field field = testAndApply(y -> size(y) == 1,
 					collect(filter(
 							stream(testAndApply(Objects::nonNull, getClass(x), FieldUtils::getAllFieldsList, null)),
-							f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+							f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 					y -> get(y, 0), null);
 			//
 			return field == null || Narcissus.getField(x, field) != null;
@@ -266,7 +272,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
+						f -> Objects.equals(getName(f), INITIALIZED)), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
 		return field == null
@@ -287,7 +293,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
+						f -> Objects.equals(getName(f), INITIALIZED)), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
 		return (field == null
@@ -315,7 +321,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "initialized")), Collectors.toList()),
+						f -> Objects.equals(getName(f), INITIALIZED)), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
 		return field == null
@@ -375,7 +381,7 @@ public class KeyStoreCertificateUpdater {
 		if ((field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(domain), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				x -> get(x, 0), null)) != null && Narcissus.getField(domain, field) == null) {
 			//
 			return false;
@@ -397,7 +403,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "delegate")), Collectors.toList()),
+						f -> Objects.equals(getName(f), DELEGATE)), Collectors.toList()),
 				x -> get(x, 0), null);
 
 		//
@@ -415,7 +421,7 @@ public class KeyStoreCertificateUpdater {
 		//
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(stream(testAndApply(Objects::nonNull, getClass(a), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
 		final boolean conditionA = or(field, Objects::isNull, f -> Narcissus.getField(a, f) != null);
@@ -504,7 +510,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "delegate")), Collectors.toList()),
+						f -> Objects.equals(getName(f), DELEGATE)), Collectors.toList()),
 				x -> get(x, 0), null);
 
 		//
@@ -523,7 +529,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "delegate")), Collectors.toList()),
+						f -> Objects.equals(getName(f), DELEGATE)), Collectors.toList()),
 				x -> get(x, 0), null);
 
 		//
@@ -606,7 +612,7 @@ public class KeyStoreCertificateUpdater {
 		final Field field = testAndApply(x -> size(x) == 1,
 				collect(filter(
 						stream(testAndApply(Objects::nonNull, getClass(string), FieldUtils::getAllFieldsList, null)),
-						f -> Objects.equals(getName(f), "value")), Collectors.toList()),
+						f -> Objects.equals(getName(f), VALUE)), Collectors.toList()),
 				x -> get(x, 0), null);
 		//
 		if (string != null && field != null && Narcissus.getField(string, field) == null) {
