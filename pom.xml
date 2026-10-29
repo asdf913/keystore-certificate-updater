@@ -8,6 +8,7 @@
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
+		<sonar.organization>asdf913</sonar.organization>
 	</properties>
 	<dependencies>
 		<!--https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
