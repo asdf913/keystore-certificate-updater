@@ -1,6 +1,7 @@
 /.classpath
 /.project
 /.settings/
+/KeyStoreCertificateUpdater.log
 /dependency-reduced-pom.xml
 /target/
 /test-output/

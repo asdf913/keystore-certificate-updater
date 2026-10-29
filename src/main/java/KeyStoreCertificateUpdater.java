@@ -49,10 +49,14 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.validator.routines.DomainValidator;
 import org.d2ab.function.ObjIntPredicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.github.toolfactory.narcissus.Narcissus;
 
 public class KeyStoreCertificateUpdater {
+
+	private static final Logger LOG = LoggerFactory.getLogger(KeyStoreCertificateUpdater.class);
 
 	private static final String DELEGATE = "delegate";
 
@@ -68,19 +72,18 @@ public class KeyStoreCertificateUpdater {
 		//
 		final MessageDigest md = MessageDigest.getInstance("SHA-256");
 		//
-		System.out.println("URL                 =" + url);
+		info(LOG, "URL                 ={}", url);
 		//
 		final Certificate certificate = getCertfiicate(url);
 		//
-		System.out.printf("Certificate(%1$s)=%2$s%3$s", getAlgorithm(md),
+		info(LOG, "Certificate({})={}", getAlgorithm(md),
 				testAndApply(Objects::nonNull,
 						testAndApply(Objects::nonNull, getEncoded(certificate), x -> digest(md, x), null),
-						Hex::encodeHexString, null),
-				System.lineSeparator());
+						Hex::encodeHexString, null));
 		//
 		final File keyStoreFile = testAndApply(Objects::nonNull, get(map, "keyStore"), File::new, null);
 		//
-		System.out.println("keyStore            =" + getAbsolutePath(keyStoreFile));
+		info(LOG, "keyStore            ={}", getAbsolutePath(keyStoreFile));
 		//
 		final char[] password = toCharArray(get(map, "password"));
 		//
@@ -138,16 +141,22 @@ public class KeyStoreCertificateUpdater {
 					//
 				} // try
 					//
-				System.out.println("Certificate is added in keystore " + keyStoreFile);
+				info(LOG, "Certificate is added in keystore {}", keyStoreFile);
 				//
 			} else if (keyStoreFile != null) {
 				//
-				System.out.println("Certificate is found in keystore " + keyStoreFile);
+				info(LOG, "Certificate is found in keystore {}", keyStoreFile);
 				//
 			} // if
 				//
 		} // try
 			//
+	}
+
+	private static void info(final Logger instance, final String format, final Object... arguments) {
+		if (instance != null) {
+			instance.info(format, arguments);
+		}
 	}
 
 	private static char[] toCharArray(final String instance) {
