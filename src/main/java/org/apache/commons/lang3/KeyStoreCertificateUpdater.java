@@ -135,7 +135,8 @@ public class KeyStoreCertificateUpdater {
 				//
 				keyStore.setCertificateEntry(alias, certificate);
 				//
-				try (final OutputStream os = new FileOutputStream(keyStoreFile)) {
+				try (final OutputStream os = testAndApply(Objects::nonNull, keyStoreFile, FileOutputStream::new,
+						null)) {
 					//
 					keyStore.store(os, password);
 					//
