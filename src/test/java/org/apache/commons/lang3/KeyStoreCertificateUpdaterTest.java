@@ -13,6 +13,8 @@ import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -382,6 +384,10 @@ class KeyStoreCertificateUpdaterTest {
 					add(collection, Narcissus
 							.allocateInstance(Class.forName("sun.net.www.protocol.https.HttpsURLConnectionImpl")));
 					//
+				} else if (Objects.equals(parameterType, ZoneId.class)) {
+					//
+					add(collection, ZoneId.systemDefault());
+					//
 				} else if (Objects.equals(parameterType, Certificate.class)
 						|| Objects.equals(parameterType, X509Certificate.class)) {
 					//
@@ -424,7 +430,9 @@ class KeyStoreCertificateUpdaterTest {
 					|| Boolean.logicalAnd(Objects.equals(name, "getName"),
 							Arrays.equals(parameterTypes, new Object[] { X500Principal.class }))
 					|| Boolean.logicalAnd(Objects.equals(name, "filter"),
-							Arrays.equals(parameterTypes, new Object[] { Stream.class, Predicate.class }))) {
+							Arrays.equals(parameterTypes, new Object[] { Stream.class, Predicate.class }))
+					|| Boolean.logicalAnd(Objects.equals(name, "withZone"),
+							Arrays.equals(parameterTypes, new Object[] { DateTimeFormatter.class, ZoneId.class }))) {
 				//
 				Assert.assertNotNull(result, toString);
 				//

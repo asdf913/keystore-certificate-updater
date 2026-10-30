@@ -21,6 +21,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -124,6 +128,21 @@ public class KeyStoreCertificateUpdater {
 				//
 			if (!found && certificate != null && load) {
 				//
+				final String name = getName(keyStoreFile);
+				//
+				if (!StringUtils.contains(name, '.')) {
+					//
+					final StringBuilder sb = new StringBuilder(name);
+					//
+					sb.append('.');
+					//
+					sb.append(format(withZone(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"), ZoneId.systemDefault()),
+							Instant.ofEpochMilli(keyStoreFile.lastModified())));
+					//
+					FileUtils.copyFile(keyStoreFile, new File(keyStoreFile.getParent(), Objects.toString(sb)));
+					//
+				} // if
+					//
 				final X509Certificate x509Certificate = cast(X509Certificate.class, certificate);
 				//
 				final DateFormat df = new SimpleDateFormat("yyyyMMdd");
@@ -152,6 +171,46 @@ public class KeyStoreCertificateUpdater {
 				//
 		} // try
 			//
+	}
+
+	private static String format(final DateTimeFormatter instance, final TemporalAccessor temporalAccessor) {
+		//
+		if (instance == null) {
+			//
+			return null;
+			//
+		} // if
+			//
+		final Field field = testAndApply(y -> size(y) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "printerParser")), Collectors.toList()),
+				y -> get(y, 0), null);
+		//
+		return field == null || Narcissus.getField(instance, field) != null ? instance.format(temporalAccessor) : null;
+		//
+	}
+
+	private static DateTimeFormatter withZone(final DateTimeFormatter instance, final ZoneId zoneId) {
+		//
+		if (instance == null || zoneId == null) {
+			//
+			return instance;
+			//
+		} // if
+			//
+		final Field field = testAndApply(y -> size(y) == 1,
+				collect(filter(
+						stream(testAndApply(Objects::nonNull, getClass(instance), FieldUtils::getAllFieldsList, null)),
+						f -> Objects.equals(getName(f), "printerParser")), Collectors.toList()),
+				y -> get(y, 0), null);
+		//
+		return field != null && Narcissus.getField(instance, field) != null ? instance.withZone(zoneId) : instance;
+		//
+	}
+
+	private static String getName(final File instance) {
+		return instance != null && instance.getPath() != null ? instance.getName() : null;
 	}
 
 	private static void info(final Logger instance, final String format, final Object... arguments) {
